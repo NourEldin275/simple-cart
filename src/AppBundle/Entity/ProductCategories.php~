@@ -1,0 +1,47 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Nour Eldin
+ * Date: 3/29/2017
+ * Time: 10:21 PM
+ */
+
+namespace AppBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * Class ProductCategories
+ * @package AppBundle\Entity
+ * @ORM\Entity
+ * @ORM\Table(name="product_categories")
+ */
+class ProductCategories
+{
+    /**
+     * @var
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="A Category must have a name!")
+     */
+    private $category_name;
+
+    /**
+     * @var
+     * @ORM\Column(type="string")
+     */
+    private $description;
+
+    /**
+     * @var
+     * @ORM\OneToMany(targetEntity="Products", mappedBy="category")
+     */
+    private $products;
+
+}
