@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List Products{% endblock %}
+
+{% block body %}
+    <h1>Products</h1>
+
+        {% if products is not empty %}
+            <table class="table table-border table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Items In Stock</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ product.productName }}</td>
+                        <td>{{ product.category.categoryName }}</td>
+                        <td>{{ product.itemPrice }}</td>
+                        <td>{{ product.itemsInStock }}</td>
+                        <td>
+                            <a href="{{ url('edit_product', {'product': product.id}) }}" class="btn btn-warning">Edit</a>
+                            <a href="{{ url('delete_product', {'product': product.id}) }}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+        {% else %}
+            <div class="alert alert-info" role="alert">No Product Found.
+                <a href="{{ url('add_new_product') }}" class="btn btn-primary">Add Now!</a>
+            </div>
+        {% endif %}
+
+
+{% endblock %}

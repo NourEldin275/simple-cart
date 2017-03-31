@@ -2,19 +2,19 @@
 
 {% set route = app.request.attributes.get("_route") %}
 {% set page = '' %} {#This will denote that the page is either for adding a new item or editing an exisiting item#}
-{% if route == 'add_new_category' %}
+{% if route == 'add_new_product' %}
     {% set page = 'Add New' %}
 {% else %}
-    {% set page = 'Edit ' ~ product_category.categoryName %}
+    {% set page = 'Edit ' ~ product.productName %}
 {% endif %}
 
-{% block title %}{{ page }} Product Category{% endblock %}
+{% block title %}{{ page }} Product{% endblock %}
 
 {% block body %}
 
-    <h1>{{ page }} Product Category</h1>
+    <h1>{{ page }} Product</h1>
 
-    {{ include ('product-category/form.html.twig' , { 'form': form }) }}
+    {{ include ('product/form.html.twig' , { 'form': form }) }}
 
 
 {% endblock %}

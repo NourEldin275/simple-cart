@@ -5,38 +5,42 @@
 {% block body %}
     <h1>Product Categories</h1>
 
-    <table class="table table-border table-hover">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Category Name</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
 
-        <tbody>
 
         {% if product_categories is not empty %}
-            {% for category in product_categories %}
+            <table class="table table-border table-hover">
+                <thead>
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ category.categoryName }}</td>
-                    <td>{{ category.description|length > 35 ? category.description|slice(0, 35) ~ '...' :category.description}}</td>
-                    <td>
-                        <a href="{{ url('edit_product_category', {'product_category': category.id} ) }}" class="btn btn-warning">Edit</a>
-                        <a href="{{ url('delete_product_category', {'product_category': category.id}) }}" class="btn btn-danger">Delete</a>
-                    </td>
+                    <th>#</th>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Products</th>
+                    <th>Actions</th>
                 </tr>
-            {% endfor %}
+                </thead>
+
+                <tbody>
+                {% for category in product_categories %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ category.categoryName }}</td>
+                        <td>{{ category.description|length > 35 ? category.description|slice(0, 35) ~ '...' :category.description}}</td>
+                        <td>{{ category.products|length }}</td>
+                        <td>
+                            <a href="{{ url('edit_product_category', {'product_category': category.id} ) }}" class="btn btn-warning">Edit</a>
+                            <a href="{{ url('delete_product_category', {'product_category': category.id}) }}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
         {% else %}
             <div class="alert alert-info" role="alert">
-                <p>No Product Categories Found.</p>
-                <a href="{{ url('add_new_category') }}">Add Now!</a>
+                No Product Categories Found.
+                <a href="{{ url('add_new_category') }}" class="btn btn-primary">Add Now!</a>
             </div>
         {% endif %}
 
-        </tbody>
 
-    </table>
 {% endblock %}
