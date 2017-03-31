@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shop{% endblock %}
+
+
+{% block body %}
+
+    <div class="row">
+        {% if products is not empty %}
+
+            {% for product in products %}
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><strong>{{ product.productName }}</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul>
+                                <li>Product: {{ product.productName }}</li>
+                                <li>Category: {{ product.category.categoryName }}</li>
+                            </ul>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-6"><strong>Price: ${{ product.itemPrice }}</strong></div>
+                                {% if product.itemsInStock > 0 %}
+                                    <div class="col-md-6">
+                                        <a href="#" class="btn btn-primary">Add To Cart</a>
+                                    </div>
+                                {% else %}
+                                    <div class="col-md-6">
+                                        <a href="#" class="btn btn-primary disabled">Out Of Stock</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="alert alert-info" role="alert">No products.
+                <a href="{{ url('add_new_product') }}" class="btn btn-primary">Add Now</a>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

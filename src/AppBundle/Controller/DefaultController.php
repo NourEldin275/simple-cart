@@ -9,13 +9,14 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="shop")
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        // replace this example code with whatever you need
-        return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
-        ]);
+        $products = $this->getDoctrine()->getRepository('AppBundle:Product')->findAll();
+
+        return $this->render('shop/shop.html.twig', array(
+            'products' => $products,
+        ));
     }
 }
