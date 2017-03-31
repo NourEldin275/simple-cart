@@ -11,12 +11,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class ProductCategories
+ * Class ProductCategory
  * @package AppBundle\Entity
  * @ORM\Entity
- * @ORM\Table(name="product_categories")
+ * @ORM\Table(name="product_category")
  */
-class ProductCategories
+class ProductCategory
 {
     /**
      * @var
@@ -41,7 +41,7 @@ class ProductCategories
 
     /**
      * @var
-     * @ORM\OneToMany(targetEntity="Products", mappedBy="category")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Product", mappedBy="category")
      */
     private $products;
 
@@ -58,7 +58,7 @@ class ProductCategories
      *
      * @param integer $id
      *
-     * @return ProductCategories
+     * @return ProductCategory
      */
     public function setId($id)
     {
@@ -82,7 +82,7 @@ class ProductCategories
      *
      * @param string $categoryName
      *
-     * @return ProductCategories
+     * @return ProductCategory
      */
     public function setCategoryName($categoryName)
     {
@@ -106,7 +106,7 @@ class ProductCategories
      *
      * @param string $description
      *
-     * @return ProductCategories
+     * @return ProductCategory
      */
     public function setDescription($description)
     {
@@ -128,11 +128,11 @@ class ProductCategories
     /**
      * Add product
      *
-     * @param \AppBundle\Entity\Products $product
+     * @param \AppBundle\Entity\Product $product
      *
-     * @return ProductCategories
+     * @return ProductCategory
      */
-    public function addProduct(\AppBundle\Entity\Products $product)
+    public function addProduct(\AppBundle\Entity\Product $product)
     {
         $this->products[] = $product;
 
@@ -142,9 +142,9 @@ class ProductCategories
     /**
      * Remove product
      *
-     * @param \AppBundle\Entity\Products $product
+     * @param \AppBundle\Entity\Product $product
      */
-    public function removeProduct(\AppBundle\Entity\Products $product)
+    public function removeProduct(\AppBundle\Entity\Product $product)
     {
         $this->products->removeElement($product);
     }

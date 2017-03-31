@@ -11,12 +11,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Products
+ * Class Product
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="products")
  */
-class Products {
+class Product {
 
     /**
      * @var
@@ -51,7 +51,7 @@ class Products {
 
     /**
      * @var
-     * @ORM\ManyToOne(targetEntity="ProductCategories", inversedBy="products")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\ProductCategory", inversedBy="products")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      */
     private $category;
@@ -73,7 +73,7 @@ class Products {
      *
      * @param string $productName
      *
-     * @return Products
+     * @return Product
      */
     public function setProductName($productName)
     {
@@ -97,7 +97,7 @@ class Products {
      *
      * @param float $itemPrice
      *
-     * @return Products
+     * @return Product
      */
     public function setItemPrice($itemPrice)
     {
@@ -121,7 +121,7 @@ class Products {
      *
      * @param integer $itemsInStock
      *
-     * @return Products
+     * @return Product
      */
     public function setItemsInStock($itemsInStock)
     {
@@ -143,11 +143,11 @@ class Products {
     /**
      * Set category
      *
-     * @param \AppBundle\Entity\ProductCategories $category
+     * @param \AppBundle\Entity\ProductCategory $category
      *
-     * @return Products
+     * @return Product
      */
-    public function setCategory(\AppBundle\Entity\ProductCategories $category = null)
+    public function setCategory(\AppBundle\Entity\ProductCategory $category = null)
     {
         $this->category = $category;
 
@@ -157,7 +157,7 @@ class Products {
     /**
      * Get category
      *
-     * @return \AppBundle\Entity\ProductCategories
+     * @return \AppBundle\Entity\ProductCategory
      */
     public function getCategory()
     {

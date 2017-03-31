@@ -1,0 +1,19 @@
+{{ form_start(form) }}
+
+<div class="form-group">
+    {{ form_label(form.categoryName) }}
+    {{ form_errors(form.categoryName) }}
+    {{ form_widget(form.categoryName, {'attr': {'class': 'form-control'}}) }}
+</div>
+
+<div class="form-group">
+    {{ form_label(form.description) }}
+    {{ form_errors(form.description) }}
+    {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+</div>
+
+<div>
+    {{ form_widget( form.save, {'attr': {'class': 'btn btn-primary'} } ) }}
+</div>
+
+{{ form_end(form) }}
