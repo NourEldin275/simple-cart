@@ -1,15 +1,16 @@
 {% extends 'base.html.twig' %}
 
+{% set route = app.request.attributes.get("_route") %}
+{% set page = '' %}
+{% if route == 'add_new_category' %}
+    {% set page = 'Add New' %}
+{% else %}
+    {% set page = 'Edit ' ~ product_category.categoryName %}
+{% endif %}
+
+{% block title %}{{ page }} Product Category{% endblock %}
+
 {% block body %}
-
-
-    {% set route = app.request.attributes.get("_route") %}
-    {% set page = '' %}
-    {% if route == 'add_new_category' %}
-        {% set page = 'Add New' %}
-    {% else %}
-        {% set page = 'Edit' %}
-    {% endif %}
 
     <h1>{{ page }} Product Category</h1>
 
