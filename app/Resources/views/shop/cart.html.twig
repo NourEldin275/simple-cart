@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cart{% endblock %}
+
+{% block body %}
+
+    {% if items is not empty %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+
+                <div class="row">
+                    <div class="col-md-10"><strong>Simple Shopping Cart</strong></div>
+                    <div class="col-md-2"><a href="{{ url('shop') }}" class="btn btn-primary btn-xs">Back To Shop</a></div>
+                </div>
+
+            </div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Item</th>
+                    <th>Item Price</th>
+                    <th>Quantity</th>
+                    <th>Item Total</th>
+                    <th></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ item.product.productName }}</td>
+                        <td>{{ item.item_price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.item_total }}</td>
+                        <td>
+                            <a href="{{ url('remove_cart_item', {'product': item.product.id}) }}" class="btn btn-danger btn-xs">
+                                <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Remove Item
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-8"><strong>Cart Total:</strong> {{ subtotal }}</div>
+                    <div class="col-md-4">
+                        <a href="#" class="btn btn-success">Update Cart</a>
+                        <a href="{{ url('clear_cart') }}" class="btn btn-warning">Clear Cart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="alert alert-info">Cart is empty. <a href="{{ url('shop') }}" class="btn btn-primary">Shop Now</a></div>
+    {% endif %}
+
+{% endblock %}
