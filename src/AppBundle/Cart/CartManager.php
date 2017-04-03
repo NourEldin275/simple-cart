@@ -23,7 +23,7 @@ class CartManager implements \Serializable
     private $session;
 
     /**
-     * @var array Is an associative array of items with product as key to the item. Each item is an associative array
+     * @var array Is an associative array of items with product id as key to the item. Each item is an associative array
      * containing the following: "product", "quantity", "item_price", "item_total"; where "product" is the object of
      * Product entity.
      */
@@ -172,6 +172,17 @@ class CartManager implements \Serializable
         }
 
         unset($this->items[$product->getId()]);
+
+        $this->updateCartSession();
+    }
+
+
+    /**
+     * @param array $items
+     * Updates the CartManager $items and then invokes the upDateCartSession() method to update the items & subtotal.
+     */
+    public function updateCartItems( array $items){
+        $this->items = $items;
 
         $this->updateCartSession();
     }

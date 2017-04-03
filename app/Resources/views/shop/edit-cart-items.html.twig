@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Cart Items{% endblock %}
+
+{% block body %}
+    <h2>Edit Cart</h2>
+    {{ form_start(form) }}
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>Item Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+
+            {% for item in form.items %}
+                <tr class="form-inline">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ form_widget(item.itemName, {'attr': {'class': 'form-control'}}) }}</td>
+                    <td>{{ form_widget(item.itemPrice, {'attr': {'class': 'form-control'}}) }}</td>
+                    <td>{{ form_widget(item.quantity, {'attr': {'class': 'form-control', 'min': 1}}) }}</td>
+                    <td>{{ form_widget(item.itemTotal, {'attr': {'class': 'form-control'}}) }}</td>
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+        {{ form_widget(form.save, {'attr': {'class': 'btn btn-success', 'label': 'Update Cart'}}) }}
+    {{ form_end(form) }}
+{% endblock %}
