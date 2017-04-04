@@ -45,6 +45,7 @@ class Product {
     /**
      * @var
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\GreaterThanOrEqual(value="0")
      */
     private $items_in_stock;
 

@@ -23,7 +23,12 @@
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td>{{ product.productName }}</td>
-                        <td>{{ product.category.categoryName }}</td>
+                        {% if product.category is not null %}
+                            <td>{{ product.category.categoryName }}</td>
+                        {% else %}
+                            <td>No Category Set</td>
+                        {% endif %}
+
                         <td>{{ product.itemPrice }}</td>
                         <td>{{ product.itemsInStock }}</td>
                         <td>
