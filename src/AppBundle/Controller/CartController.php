@@ -18,14 +18,12 @@ class CartController extends Controller
      */
     public function indexAction()
     {
-        $cart_manager = $this->get('app.cart_manager');
-
-        $session_cart_items = $cart_manager->getCartItems();
-        $session_cart_subtotal = $cart_manager->getCartSubtotal();
+        $cart = $this->getDoctrine()->getRepository('AppBundle:Cart')->find(1);
+        $cart_items = $cart->getItems();
 
         return $this->render('shop/cart.html.twig', array(
-            'subtotal' => $session_cart_subtotal,
-            'items' => $session_cart_items,
+            'subtotal' => $cart->getSubtotal(),
+            'items' => $cart_items,
         ));
     }
 
@@ -38,25 +36,11 @@ class CartController extends Controller
 
         $cart_manager = $this->get('app.cart_manager');
 
-        $session_cart_items = $cart_manager->getCartItems();
-        $session_cart_subtotal = $cart_manager->getCartSubtotal();
-
 
         /**
          * @var $cart Cart Holds an object to represent the cart.
          */
-        $cart = new Cart();
-        $cart->setSubtotal($session_cart_subtotal);
-
-        // Creating AppBundle\Entity\CartItem objects and assigning their values from cart session. Then adding the item
-        // to AppBundle\Entity\Cart object.
-
-        foreach($session_cart_items as $cart_item){
-            $item = new CartItem($cart_item['product']);
-            $item->setQuantity($cart_item['quantity']);
-
-            $cart->addItem($item);
-        }
+        $cart = $this->getDoctrine()->getRepository('AppBundle:Cart')->find(1);
 
         $form = $this->createForm(CartType::class, $cart);
 
@@ -66,26 +50,25 @@ class CartController extends Controller
             // Updating $session_cart_items with the edited items.
             foreach( $cart->getItems() as $item ){
 
-                // if use inputs a value less than 1, show flash message to guide them how to remove items.
+                // if user inputs a value less than 1, show flash message to guide them how to remove items.
                 if ( $item->getQuantity() < 1){
 
-                    // In case we want to remove the item if the quantity is set less than 1.
-                    //unset($session_cart_items[$item->getProduct()->getId()]);
+                    // We cam also remove the item instead of setting its quantity to 1
+                    $item->setQuantity(1);
                     $this->addFlash('warning', 'If you wish to remove this item: '.$item->getItemName().' click the remove button in cart.');
-                    continue;
                 }
                 // if quantity is more than available stock
                 else if ($item->getQuantity() > $item->getProduct()->getItemsInStock()){
+                    $item->setQuantity($item->getProduct()->getItemsInStock());
                     $this->addFlash('warning', 'Only '.$item->getProduct()->getItemsInStock().' items of '.$item->getItemName().' are left.');
-                    continue;
                 }
-
-
-                $session_cart_items[$item->getProduct()->getId()]['quantity'] = $item->getQuantity();
-                $session_cart_items[$item->getProduct()->getId()]['item_total'] = $item->getItemTotal();
             }
 
-            $cart_manager->updateCartItems($session_cart_items);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($cart);
+            $em->flush();
+
+            $cart_manager->updateCartItems();
             $this->addFlash('notice', 'Cart Updated');
             return $this->redirectToRoute('cart_page');
         }
@@ -108,11 +91,28 @@ class CartController extends Controller
         if (!$product){
             throw $this->createNotFoundException('Could not add to cart. Product not found.');
         }
+        else if ( $product->getItemsInStock() < $quantity ){
+            $this->addFlash('notice', 'Only '.$product->getItemsInStock().' is left in stock for this item '. $product->getProductName());
+            return $this->redirectToRoute('shop');
+        }
 
 
         $cart_manager = $this->get('app.cart_manager');
 
-        $cart_manager->addItem($product,$quantity);
+        $cart = $this->getDoctrine()->getRepository('AppBundle:Cart')->find(1);
+
+        $item = $this->getDoctrine()->getRepository('AppBundle:CartItem')->findOneBy(array(
+            'cart' => $cart,
+            'product' => $product,
+        ));
+
+        // The it is not in the cart.
+        if ( !$item ){
+            $item = new CartItem($product, $cart);
+        }
+
+        $cart_manager->addItem($item,$quantity);
+
         $this->addFlash('notice', $product->getProductName() .' is added to cart.');
 
         return $this->redirectToRoute('cart_page');
@@ -132,7 +132,14 @@ class CartController extends Controller
 
         $cart_manager= $this->get('app.cart_manager');
 
-        $cart_manager->removeItem($product);
+        $cart = $this->getDoctrine()->getRepository('AppBundle:Cart')->find(1);
+
+        $item = $this->getDoctrine()->getRepository('AppBundle:CartItem')->findOneBy(array(
+            'cart' => $cart,
+            'product' => $product,
+        ));
+
+        $cart_manager->removeItem($item);
 
         $this->addFlash('notice', 'Item removed');
 

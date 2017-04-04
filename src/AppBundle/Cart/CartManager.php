@@ -9,181 +9,110 @@
 namespace AppBundle\Cart;
 
 
-use AppBundle\Entity\Product;
+use AppBundle\Entity\Cart;
+use AppBundle\Entity\CartItem;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class CartManager
  * @package AppBundle\Cart
  */
-class CartManager implements \Serializable
+class CartManager implements CartInterface
 {
-    private $product_repository;
-    private $session;
+    /**
+     * @var EntityManager
+     */
+    private $em;
 
     /**
-     * @var array Is an associative array of items with product id as key to the item. Each item is an associative array
-     * containing the following: "product", "quantity", "item_price", "item_total"; where "product" is the object of
-     * Product entity.
+     * @var Cart This will hold the cart object of the current user. But in this simple application, it will always
+     * hold the cart with id = 1
      */
-    private $items = array();
-
-    private $cart_subtotal;
+    private $cart;
 
     /**
      * CartManager constructor.
      * @param EntityManager $entityManager
-     * @param Session $session
      */
-    public function __construct(EntityManager $entityManager, Session $session)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->product_repository = $entityManager->getRepository('AppBundle:Product');
-        $this->session = $session;
+        $this->em = $entityManager;
 
-        if( !$this->session->isStarted() ){
-            $this->session->start();
-        }
+        //This would call the security.token_storage service to get the current user then get his cart.
+        // But in this is simple application, it will always get the first and only cart in the database
+        $this->cart = $this->em->getRepository('AppBundle:Cart')->find(1);
+
     }
 
-    /**
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
-     * @since 5.1.0
-     */
-    public function serialize()
-    {
-
-        return serialize($this->items);
-    }
-
-    /**
-     * Constructs the object
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
-     * @since 5.1.0
-     */
-    public function unserialize($serialized)
-    {
-
-//        list(
-//            $this->items
-//            ) = unserialize($serialized);
-
-        $this->items = unserialize($serialized);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCartSubtotal(){
-
-        return $this->session->get('sub_total');
-    }
-
-    /**
-     * @param $subTotal
-     * @return CartManager
-     */
-    public function setCartSubtotal($subTotal){
-
-        $this->session->set('sub_total', $subTotal);
-        return $this;
-    }
 
     /**
      * Clears the cart session.
+     * @return void
      */
     public function clearCart(){
-        $this->session->remove('items');
-        $this->session->remove('sub_total');
+
+        $items = $this->cart->getItems();
+
+        $this->cart->setSubtotal(0);
+        foreach ($items as $item){
+            $this->em->remove($item);
+        }
+        $this->em->flush();
     }
 
 
-    /**
-     * Retrieves items from session
-     * @return array
-     */
-    public function getCartItems(){
-        $this->unserialize($this->session->get('items'));
 
-        return $this->items;
-    }
 
     /**
-     * Updates the items and sub_total session attributes with modified data.
+     * Updates the cart's subtotal.
+     * @return void
      */
-    private function updateCartSession(){
+    public function updateCartSubtotal(){
 
-        $this->session->set('items', $this->serialize());
-
-        $this->setCartSubtotal(0); // resetting cart sub total before recalculating it.
-
-        foreach ( $this->items as $item ){
-            $this->cart_subtotal += $item['item_total'];
+        $this->cart->setSubtotal(0);
+        foreach ( $this->cart->getItems() as $item ){
+            $this->cart->setSubtotal( $this->cart->getSubtotal() + $item->getItemTotal() );
         }
 
-        $this->session->set('sub_total', $this->cart_subtotal);
+        $this->em->persist($this->cart);
+        $this->em->flush($this->cart);
     }
 
 
     /**
-     * @param Product $product
+     * @param CartItem $item
      * @param $quantity
+     * @return void
      */
-    public function addItem(Product $product, $quantity){
+    public function addItem(CartItem $item, $quantity){
 
-
-        if ( $this->session->get('items') ){ // if session is set
-            $this->unserialize($this->session->get('items'));
-        }
-
-        if ( !array_key_exists($product->getId(), $this->items) ){
-            $this->items[$product->getId()] = array(
-                'product' => $product,
-                'quantity' => $quantity,
-                'item_price' => $product->getItemPrice(),
-                'item_total' => $product->getItemPrice() * $quantity,
-
-            );
-        }
-
-        else{
-
-            $this->items[$product->getId()]['quantity'] += $quantity;
-            $this->items[$product->getId()]['item_total'] += $quantity * $this->items[$product->getId()]['item_price'];
-        }
-
-        $this->updateCartSession();
+        $item->setQuantity( $item->getQuantity() + $quantity );
+        $this->em->persist($item);
+        $this->em->flush();
+        $this->updateCartSubtotal();
     }
 
 
     /**
-     * @param Product $product
+     * @param CartItem $item
+     * @return void
      */
-    public function removeItem(Product $product){
+    public function removeItem(CartItem $item){
 
-        if ( $this->session->get('items') ){ // if session is set
-            $this->unserialize($this->session->get('items'));
-        }
+        $this->cart->removeItem($item);
+        $this->em->remove($item);
+        $this->em->flush();
 
-        unset($this->items[$product->getId()]);
-
-        $this->updateCartSession();
+        $this->updateCartSubtotal();
     }
 
 
     /**
-     * @param array $items
-     * Updates the CartManager $items and then invokes the upDateCartSession() method to update the items & subtotal.
+     * Updates cart with the modified items.
+     * @return void
      */
-    public function updateCartItems( array $items){
-        $this->items = $items;
+    public function updateCartItems(){
 
-        $this->updateCartSession();
+        $this->updateCartSubtotal();
     }
 }

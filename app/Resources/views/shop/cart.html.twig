@@ -31,9 +31,9 @@
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td>{{ item.product.productName }}</td>
-                        <td>{{ item.item_price }}</td>
+                        <td>{{ item.getItemPrice }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.item_total }}</td>
+                        <td>{{ item.getItemTotal }}</td>
                         <td>
                             <a href="{{ url('remove_cart_item', {'product': item.product.id}) }}" class="btn btn-danger btn-xs">
                                 <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Remove Item

@@ -73,9 +73,11 @@ class CartItem
     /**
      * CartItem constructor.
      * @param Product $product
+     * @param Cart $cart
      */
-    public function __construct(Product $product)
+    public function __construct(Product $product, Cart $cart)
     {
+        $this->setCart($cart);
         $this->setProduct($product);
         $this->setItemName($this->getProduct()->getProductName());
         $this->setItemPrice($this->getProduct()->getItemPrice());
